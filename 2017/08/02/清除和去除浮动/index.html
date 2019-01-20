@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+<title>清除和去除浮动 - ziyi2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+
+
+    <meta name="description" content="本文主要讲述了CSS的清除浮动的原理，并讲述了清除和包含浮动的主要方法。">
+<meta name="keywords" content="css,float,BFC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="清除和去除浮动">
+<meta property="og:url" content="http://www.ziyi2.cn/2017/08/02/清除和去除浮动/index.html">
+<meta property="og:site_name" content="ziyi2">
+<meta property="og:description" content="本文主要讲述了CSS的清除浮动的原理，并讲述了清除和包含浮动的主要方法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-20T14:06:35.393Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="清除和去除浮动">
+<meta name="twitter:description" content="本文主要讲述了CSS的清除浮动的原理，并讲述了清除和包含浮动的主要方法。">
+
+
+
+
+
+<link rel="icon" href="/images/favicon.jpg">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.7.2/css/bulma.css">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu:400,600|Source+Code+Pro">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css">
+
+
+    
+    
+    
+    <style>body>.footer,body>.navbar,body>.section{opacity:0}</style>
+    
+
+    
+    
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css">
+    
+
+    
+    
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.css">
+
+
+    
+    
+    
+    
+
+<link rel="stylesheet" href="/css/back-to-top.css">
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+<link rel="stylesheet" href="/css/progressbar.css">
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+    
+    
+    
+
+    
+
+
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-3-column">
+    <nav class="navbar navbar-main">
+    <div class="container">
+        <div class="navbar-brand is-flex-center">
+            <a class="navbar-item navbar-logo" href="/">
+            
+                <img src="/images/logo.jpg" alt="清除和去除浮动" height="28">
+            
+            </a>
+        </div>
+        <div class="navbar-menu">
+            
+            <div class="navbar-start">
+                
+                <a class="navbar-item" href="/">主页</a>
+                
+                <a class="navbar-item" href="/archives">归档</a>
+                
+                <a class="navbar-item" href="/categories">分类</a>
+                
+                <a class="navbar-item" href="/tags">标签</a>
+                
+            </div>
+            
+            <div class="navbar-end">
+                
+                
+                
+                <a class="navbar-item search" title="搜索" href="javascript:;">
+                    <i class="fas fa-search"></i>
+                </a>
+                
+            </div>
+        </div>
+    </div>
+</nav>
+    
+    <section class="section">
+        <div class="container">
+            <div class="columns">
+                <div class="column is-8-tablet is-8-desktop is-6-widescreen has-order-2 column-main"><div class="card">
+    
+    <div class="card-image">
+        <span class="image is-7by1">
+            <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/cssClearFloatTitle.jpg" alt="清除和去除浮动">
+        </span>
+    </div>
+    
+    <div class="card-content article ">
+        
+        <div class="level article-meta is-size-7 is-uppercase is-mobile is-overflow-x-auto">
+            <div class="level-left">
+                <time class="level-item has-text-grey" datetime="2017-08-02T14:00:27.000Z">2017-08-02</time>
+                
+                <div class="level-item">
+                <a class="has-link-grey -link" href="/categories/前端/">前端</a>
+                </div>
+                
+                
+                <span class="level-item has-text-grey">
+                    
+                    
+                    27 分钟 读完 (大约 4103 个字)
+                </span>
+                
+            </div>
+        </div>
+        
+        <h1 class="title is-size-3 is-size-4-mobile has-text-weight-normal">
+            
+                清除和去除浮动
+            
+        </h1>
+        <div class="content">
+            <p>本文主要讲述了CSS的清除浮动的原理，并讲述了清除和包含浮动的主要方法。</p>
+<a id="more"></a>
+<h2 id="浮动的原理"><a href="#浮动的原理" class="headerlink" title="浮动的原理"></a>浮动的原理</h2><p>浮动和定位一样会以某种方式将元素从文档的正常流中删除，而且会影响布局。一个元素浮动时，其他内容会”环绕”该元素。</p>
+<h3 id="浮动的特点"><a href="#浮动的特点" class="headerlink" title="浮动的特点"></a>浮动的特点</h3><ul>
+<li>浮动元素周围的外边距不会合并（其实是浮动元素形成了新的<code>BFC</code> ，后续讲解）</li>
+</ul>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">	.box&#123;</span><br><span class="line">		width: <span class="hljs-number">100</span>%;</span><br><span class="line">		height: <span class="hljs-number">200</span>px;</span><br><span class="line">		background: #ececdd;</span><br><span class="line">	    margin-left: auto;</span><br><span class="line">		margin-right: auto;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	.inner-nofloat &#123;</span><br><span class="line">		width: <span class="hljs-number">100</span>%;</span><br><span class="line">		height: <span class="hljs-number">20</span>px;</span><br><span class="line">		background: #f7c3c3;</span><br><span class="line">		margin-bottom: <span class="hljs-number">40</span>px;</span><br><span class="line">		margin-top: <span class="hljs-number">20</span>px;     <span class="hljs-comment">/*两个nofloat之间的外边距是40px，进行了合并处理*/</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	.inner-float &#123;</span><br><span class="line">		width: <span class="hljs-number">100</span>%;</span><br><span class="line">		height: <span class="hljs-number">20</span>px;</span><br><span class="line">		background: #d3cff7;</span><br><span class="line">		float: left;</span><br><span class="line">		margin-bottom: <span class="hljs-number">40</span>px;  <span class="hljs-comment">/*float和nofloat之间的外边距是60px，并没有进行合并处理*/</span></span><br><span class="line">		margin-top: <span class="hljs-number">20</span>px;</span><br><span class="line">	&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">  &lt;div class="inner-nofloat"&gt;&lt;/</span>div&gt;</span><br><span class="line">  &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"inner-nofloat"</span>&gt;&lt;/div&gt;</span><br><span class="line">  &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"inner-float"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div style="width: 100%;height: 200px;background: #ececdd;margin-left: auto;margin-right: auto;"><div class="inner-nofloat" style="width: 100%;height: 20px;background: #f7c3c3;margin-bottom: 40px;margin-top: 20px; "></div><div class="inner-nofloat" style="width: 100%;height: 20px;background: #f7c3c3;margin-bottom: 40px;margin-top: 20px; "></div><div class="inner-nofloat" style="width: 100%;height: 20px;background: #d3cff7;float:left;margin-bottom: 40px; margin-top: 20px;"></div></div>
+
+
+<ul>
+<li>浮动元素的包含块是其最近的祖先元素</li>
+<li>浮动元素会生成一个块级框即使元素本身是行内元素，因此没有必要给浮动元素增加<code>display:block</code>代码</li>
+</ul>
+<h3 id="浮动的规则"><a href="#浮动的规则" class="headerlink" title="浮动的规则"></a>浮动的规则</h3><ul>
+<li>浮动元素的左（右）外边界不能超出其包含块的左（右）内边界，即左浮动元素的左外边界向左最远只能到达其包含块的左内边界，右浮动元素类似。</li>
+</ul>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">  .box&#123;</span><br><span class="line">    width: <span class="hljs-number">90</span>%;</span><br><span class="line">    height: <span class="hljs-number">200</span>px;</span><br><span class="line">    background: #ececdd;</span><br><span class="line">    margin-left: auto;</span><br><span class="line">    margin-right: auto;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .inner-float-left &#123;</span><br><span class="line">    width: <span class="hljs-number">100</span>%;</span><br><span class="line">    height: <span class="hljs-number">20</span>px;</span><br><span class="line">    background: #d3cff7;</span><br><span class="line">    float: left;</span><br><span class="line">    margin-bottom: <span class="hljs-number">40</span>px;</span><br><span class="line">    margin-top: <span class="hljs-number">20</span>px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .inner-float-right &#123;</span><br><span class="line">    width: <span class="hljs-number">100</span>%;</span><br><span class="line">    height: <span class="hljs-number">20</span>px;</span><br><span class="line">    background: #d3cff7;</span><br><span class="line">    float: right;</span><br><span class="line">    margin-bottom: <span class="hljs-number">40</span>px;</span><br><span class="line">    margin-top: <span class="hljs-number">20</span>px;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">	&lt;div class="inner-float-left"&gt;&lt;/</span>div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"inner-float-right"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div style="  width: 90%;height: 200px;background: #ececdd;margin-left: auto;margin-right: auto;"><div class="inner-float-left" style="  width: 106%;height: 20px;background: #d3cff7;float: left;margin-bottom: 40px;margin-top: 20px;"></div><div class="inner-float-right" style="  width: 106%;height: 20px;background: #d3cff7;float: right;margin-bottom: 40px;margin-top: 20px;"></div></div>
+
+<ul>
+<li>浮动元素的左（右）外边界必须是源文档中（父元素）之前出现的左浮动（右浮动）元素的右（左）外边界，除非后出现的元素浮动元素的顶端在先出现浮动元素的底端下面。<br>这个规则的好处是防止浮动元素的重叠。使用定位时很容易导致元素的相互覆盖。</li>
+<li>左浮动元素的右外边界不会在其右边右浮动元素的左外边界的右边。一个右浮动元素的左外边界不会在其左边任何左浮动元素的右外边界的左边。</li>
+<li>一个浮动元素的顶端不能比其父元素的内顶端高。</li>
+<li>一个浮动元素的顶端不能比其父元素的内顶端高。</li>
+<li>源文档的一个浮动元素之前出现的另一个元素，浮动元素的顶端不能比包含该元素所生成框的任何行框的顶端更高。</li>
+<li>左（右）浮动元素的左边（右边）有另一个浮动元素，前者的右外边界不能在其包含块的右（左）边界的右边（左边）。</li>
+<li>浮动元素尽可能高的放置。</li>
+<li>左浮动元素想左浮动尽可能的远，右浮动元素必须向右尽可能远。</li>
+</ul>
+<h3 id="浮动带来的布局问题"><a href="#浮动带来的布局问题" class="headerlink" title="浮动带来的布局问题"></a>浮动带来的布局问题</h3><p>浮动的规则只讲述了浮动元素的左、右和上边界，但是没有涉及到下边界。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">  .box&#123;</span><br><span class="line">    border: 2px solid #c9f6f2;</span><br><span class="line">    width: <span class="hljs-number">100</span>%;</span><br><span class="line">    background: #ececdd;</span><br><span class="line">    margin-left: auto;</span><br><span class="line">    margin-right: auto;</span><br><span class="line">    margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .inner-nofloat &#123;</span><br><span class="line">    width: <span class="hljs-number">100</span>%;</span><br><span class="line">    height: <span class="hljs-number">200</span>px;</span><br><span class="line">    background: #f7c3c3;</span><br><span class="line">    margin:<span class="hljs-number">20</span>px <span class="hljs-number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .inner-float &#123;</span><br><span class="line">    width: <span class="hljs-number">100</span>%;</span><br><span class="line">    height: <span class="hljs-number">200</span>px;</span><br><span class="line">    background: #d3cff7;</span><br><span class="line">    float: left;</span><br><span class="line">    margin:<span class="hljs-number">20</span>px <span class="hljs-number">0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">  &lt;div class="inner-nofloat"&gt;&lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">  &lt;div class="inner-float"&gt;&lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="inner-nofloat" style="  width: 100%;height: 200px;background: #f7c3c3; margin:20px 0;"></div></div><div style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="inner-float" style=" width: 100%;height: 200px;background: #d3cff7;float: left; margin:20px 0;"></div></div>    
+
+<p><br style="clear:both"></p>
+<p>如果元素不浮动，那么父块级元素默认会包含子块级元素，从而使子元素显示在父元素之内，但是一旦子元素浮动，那么父元素将不会包含子元素，因为浮动元素不在正常流中，而它的父元素在正常流中，因此处于正常流的父元素并不能包含子浮动元素，从而导致父元素在没有其他子元素且没有设置高度的情况下会产生<strong>高度塌陷</strong>。<strong>CSS2.1</strong>澄清了浮动元素行为的一个方面：浮动元素会延伸，从而包含其所有后代浮动元素（其实还是因为浮动元素形成了新的<code>BFC</code>，后续讲解）。所以通过设置第二个<code>box</code>为浮动元素，可以把浮动元素包含在其<code>box</code>内。</p>
+<div style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="inner-nofloat" style="  width: 100%;height: 200px;background: #f7c3c3; margin:20px 0;"></div></div><div style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px; float:left"><div class="inner-float" style=" width: 100%;height: 200px;background: #d3cff7;float: left; margin:20px 0;"></div></div>    
+
+
+
+
+
+<p><br style="clear:both"></p>
+<blockquote>
+<p>那么如果这个父元素的包含块仍然不是浮动元素也可能导致包含块的高度塌陷！</p>
+</blockquote>
+<h2 id="清除浮动的原理"><a href="#清除浮动的原理" class="headerlink" title="清除浮动的原理"></a>清除浮动的原理</h2><p>利用清除可以设置元素禁止浮动元素出现在它的左侧、右侧甚至是双侧。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">	div &#123;</span><br><span class="line">		display: inline-block;</span><br><span class="line">		width: <span class="hljs-number">40</span>%;</span><br><span class="line">		height: <span class="hljs-number">100</span>px;</span><br><span class="line">		background: #d3cff7;</span><br><span class="line">		margin-right: <span class="hljs-number">10</span>px;</span><br><span class="line">		margin-bottom : <span class="hljs-number">0</span>;</span><br><span class="line">		padding: <span class="hljs-number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	.float &#123;</span><br><span class="line">		float: left;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	.box &#123;</span><br><span class="line">		height: <span class="hljs-number">50</span>px;</span><br><span class="line">	&#125;</span><br><span class="line">	p &#123;</span><br><span class="line">		border: <span class="hljs-number">1</span>px solid black;</span><br><span class="line">		margin:<span class="hljs-number">0</span>;</span><br><span class="line">		padding:<span class="hljs-number">0</span>;</span><br><span class="line">		width: <span class="hljs-number">80</span>%;</span><br><span class="line">	&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="float"&gt;&lt;/</span>div&gt;</span><br><span class="line">&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"box"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;p&gt;<span class="hljs-number">3333333333333333333333333333333333333333333</span>&lt;<span class="hljs-regexp">/p&gt;</span></span><br></pre></td></tr></table></figure>
+<div style="display: inline-block;width: 40%;height: 100px;background: #d3cff7;margin-right: 10px;float:left; margin-bottom : 0;">1</div><div style="display:inline-block;width: 40%;height: 50px;background: #d3cff7;margin-right: 10px;margin-bottom : 0;padding: 0;">2</div><p style="border: 1px solid black;margin:0;padding:0;width: 80%;">3333333333333333333333333333333333333333333</p><div style="clear:both"></div>
+
+
+<p>由于<code>div1</code>浮动，<code>p</code>和<code>div1</code>布局重叠，为了解决这个问题，可以使<code>p</code>元素左侧不允许有浮动元素，给<code>p</code>元素添加一个<code>clear:left</code>的样式之后</p>
+<div style="display: inline-block;width: 40%;height: 100px;background: #d3cff7;margin-right: 10px;float:left">1</div><div style="display: inline-block;width: 40%;height: 50px;background: #d3cff7;margin: 10px;">2</div><p style="border: 1px solid black;margin:0;padding:0;width: 80%; clear:left;">3333333333333333333333333333333333333333333</p><br>可以发现<code>p</code>的位置下移从而使<code>p</code>和<code>div1</code>布局不会重叠，其实是使用清除之后，自动增加了<code>p</code>元素的上外边距，确保它落在浮动元素<code>div1</code>的下面。<strong>CSS2.1</strong>引入了<strong>清除区域</strong>的概念，<strong>清除区域</strong>是在元素上外边距之上增加的额外间隔（确保浮动元素不会与该元素重叠），不允许浮动元素进入这个范围，意味着设置<code>clear</code>属性的<code>p</code>元素的外边距并不改变，之所以该元素会向下移动是因为<strong>清除区域</strong>造成的。<code>div1</code>和<code>div2</code>的高度分别是<code>100px</code>和<code>50px</code>， 因此<strong>清除区域</strong>的高度在<code>50px</code>左右（不算<code>border</code>和浏览器代理初始样式等）。如果给<code>p</code>元素一个上外边距<code>margin-top:30px</code>，则<code>p</code>元素并不会向下移动<code>30px</code>，而是在解析完样式之后<strong>清除区域</strong>的高度变成了<code>50px - 30px</code>左右，而<code>p</code>元素仍然位置不变，如果要使<code>p</code>元素下移，则需要使<code>p</code>元素的<code>margin-top</code>值高于最大的<strong>清除区域</strong>高度<code>50px</code>，并且向下位移的距离也是<code>margin-top</code>值减去最大的<strong>清除区域</strong>高度。<br><br>通常情况下，我们当然很难准确计算最大的<strong>清除区域</strong>高度，因此要使浮动元素<code>div1</code>和<code>p</code>元素有一个确定的值很难通过设置<code>p</code>元素的上外边距获取效果，而是应该设置<code>div1</code>的下外边距<code>margin-bottom</code>（仍然是因为浮动元素形成了<code>BFC</code>上下文）。例如需要确定浮动元素和<code>p</code>元素上下距离为<code>15px</code><br><br><div style="display: inline-block;width: 40%;height: 100px;background: #d3cff7;margin-right: 10px;float:left; margin-bottom:15px;">1</div><div style="display: inline-block;width: 40%;height: 50px;background: #d3cff7;margin: 10px;">2</div><p style="border: 1px solid black;margin:0;padding:0;width: 80%; clear:left;">3333333333333333333333333333333333333333333</p><div style="clear"></div>
+
+
+<h2 id="清除浮动的方法"><a href="#清除浮动的方法" class="headerlink" title="清除浮动的方法"></a>清除浮动的方法</h2><p>浮动容易导致块级父元素的高度塌陷，通过直接设置父元素的高度以及设置父元素为浮动元素并不能很好的解决元素浮动带来的布局问题，因此可以通过<code>clear</code>属性来清除浮动。</p>
+<h3 id="追加元素并设置clear属性"><a href="#追加元素并设置clear属性" class="headerlink" title="追加元素并设置clear属性"></a>追加元素并设置<code>clear</code>属性</h3><ul>
+<li>优势：简单，布局灵活，浏览器兼容性好</li>
+<li>弊端：结构和表现混淆，添加了不必要的<code>DOM</code>元素，不便于后期维护</li>
+</ul>
+<p>如果父元素高度塌陷，则可以通过在父元素的尾部追加空的子元素，并利用<code>clear:both</code>解决塌陷问题。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">.box&#123;</span><br><span class="line">	border: 2px solid #c9f6f2;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">	background: #ececdd;</span><br><span class="line">	margin-left: auto;</span><br><span class="line">	margin-right: auto;</span><br><span class="line">	margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">&#125;</span><br><span class="line">.float &#123;</span><br><span class="line">	width: <span class="hljs-number">25</span>%;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	float: left;</span><br><span class="line">	background: #d3cff7;</span><br><span class="line">	margin:<span class="hljs-number">10</span>px;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">	&lt;div class="float"&gt;&lt;/</span>div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="box" style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div></div>    <br style="clear:both"><br><br><br><br>如果父元素没有设置高度，那么因为三个浮动子元素脱离正常流导致父元素的高度塌陷，如果给第三个浮动子元素加上<code>clear:both</code>的样式，并没有解决高度塌陷的问题，因为非浮动父元素仍然不能包含浮动子元素。<br><br><div class="box" style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px; clear:left;"></div></div>    
+
+<p><br style="clear:both"></p>
+<p>此时如果给父元素的尾部添加一个非浮动子元素并给出样式<code>clear:both</code>，由于这个子元素是非浮动元素，通过<strong>清除的原理</strong>可以知道相对之前的浮动元素，该非浮动元素会生成一个<strong>清除区域</strong>，这个<strong>清除区域</strong>的高度可以促使非浮动元素处于浮动元素的下方，而且非浮动元素和浮动元素之间的准确边距通常由浮动元素的下边距确定，因此导致这个非浮动元素处于三个浮动子元素的下方<code>10px</code>处（三个浮动元素的样式<code>margin:10px</code>导致），又因为父元素包含了这个非浮动子元素，从而使父元素也可以包含浮动元素，解决了<strong>高度塌陷</strong>的问题（当然添加的非浮动子元素一般都是空元素，例如<code>br</code>）。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line"></span><br><span class="line">.box&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line">.float &#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.nofloat &#123;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">	height: <span class="hljs-number">20</span>px;</span><br><span class="line">	background: #f5d5ea;</span><br><span class="line">	margin:<span class="hljs-number">0</span>;</span><br><span class="line">	padding:<span class="hljs-number">0</span>;</span><br><span class="line">	clear: both;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">	&lt;div class="float"&gt;&lt;/</span>div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"nofloat"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="box" style="border: 2px solid #c9f6f2;width: 100%;background: #ececdd;margin-left: auto;margin-right: auto;margin-bottom: 50px;"><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div class="float" style="    width: 25%;height: 100px;float: left;background: #d3cff7;margin:10px;"></div><div style="width: 100%;height: 20px;background: #f5d5ea;margin:0;padding:0;clear: both;"></div>    </div>
+
+
+<h3 id="使用CSS样式插入元素"><a href="#使用CSS样式插入元素" class="headerlink" title="使用CSS样式插入元素"></a>使用CSS样式插入元素</h3><ul>
+<li>优势：不破坏文档结构，没有副作用</li>
+<li>劣势：使用<code>display:block</code>会使父子元素的垂直外边距重叠（后续详细说明）</li>
+</ul>
+<p>原理其实和追加元素并设置<code>clear</code>属性相同，只是使用<code>css</code>样式来处理。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">.box&#123;</span><br><span class="line">	border: 2px solid #c9f6f2;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">	background: #ececdd;</span><br><span class="line">	margin-left: auto;</span><br><span class="line">	margin-right: auto;</span><br><span class="line">	margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.clearfix:after &#123;</span><br><span class="line">	content: <span class="hljs-string">''</span>;</span><br><span class="line">	display: block;</span><br><span class="line">	clear: both;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.float &#123;</span><br><span class="line">	width: <span class="hljs-number">25</span>%;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	float: left;</span><br><span class="line">	background: #d3cff7;</span><br><span class="line">	margin:<span class="hljs-number">10</span>px;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box clearfix"&gt;</span></span><br><span class="line"><span class="hljs-regexp">	&lt;div class="float"&gt;&lt;/</span>div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">	&lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"float"</span>&gt;&lt;/div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="包含浮动的原理"><a href="#包含浮动的原理" class="headerlink" title="包含浮动的原理"></a>包含浮动的原理</h2><p>解决浮动元素带来布局的副作用的方法之一是使用<code>clear</code>清除浮动，但是也可以利用<code>BFC</code>的特性来包含浮动从而解决父元素高度塌陷的问题。</p>
+<h3 id="什么是BFC"><a href="#什么是BFC" class="headerlink" title="什么是BFC"></a>什么是<code>BFC</code></h3><p><code>BFC(Block formatting context)</code>直译为”块级格式化上下文”。它是一个独立的渲染区域，只有<code>Block-level box</code>参与， 它规定了内部的<code>Block-level Box</code>如何布局，并且与这个区域外部毫不相干。 <code>block-level box</code>是<code>display</code>属性为<code>block， list-item， table</code>的元素，会生成<code>block-level box</code>，并且参与<code>block fomatting context</code>。 具体可以从<a href="http://web.jobbole.com/84808/" target="_blank" rel="noopener">什么是BFC</a>中了解<code>BFC</code>的特性。</p>
+<h3 id="BFC特性"><a href="#BFC特性" class="headerlink" title="BFC特性"></a><code>BFC</code>特性</h3><ul>
+<li><code>BFC</code>会阻止垂直外边距（<code>margin-top</code>、<code>margin-bottom</code>）折叠（属于同一个<code>BFC</code>的两个相邻<code>Box</code>的<code>margin</code>会发生重叠 ）</li>
+<li><code>BFC</code>不会重叠浮动元素</li>
+<li><code>BFC</code>可以包含浮动（计算<code>BFC</code>的高度时，浮动元素的高度也参与计算 ，可以利用<code>BFC</code>的这个特性来“清浮动”，应该说包含浮动。也就是说只要父容器形成<code>BFC</code>就可以）</li>
+</ul>
+<p>需要注意的是根元素本身就能触发一个<code>BFC</code>，事实上除了根元素以外以下的方式也能触发<code>BFC</code></p>
+<ul>
+<li><code>float （left，right）</code></li>
+<li><code>overflow</code> 除了<code>visible</code> 以外的值<code>（hidden，auto，scroll）</code> </li>
+<li><code>display (table-cell，table-caption，inline-block)</code> </li>
+<li><code>position（absolute，fixed）</code> </li>
+</ul>
+<p><code>BFC</code>就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之也如此。意思是可以把能创建<code>BFC</code>的盒子当作那个根元素，同时这个创建了<code>BFC</code>的盒子则是一个独立的容器，里面参与<code>BFC</code>的块级盒不会影响到盒子外面的盒子，外面的盒子也不会影响到里面参与了<code>BFC</code>的块级盒。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">.box &#123;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">&#125;</span><br><span class="line">.bfc-float-box1 &#123;</span><br><span class="line">	float: left;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">	background: #ececdd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.bfc-float-box2 &#123;</span><br><span class="line">	float: left;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">	background: #f9d7f7;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">.bfc-inner-box1 &#123;</span><br><span class="line">	margin-bottom: <span class="hljs-number">30</span>px;</span><br><span class="line">	width: <span class="hljs-number">100</span>px;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	background: #f7c3c3;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.bfc-inner-box2 &#123;</span><br><span class="line">	margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">	width: <span class="hljs-number">100</span>px;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	background: #d3cff7;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box" style="width: 100%;"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="bfc-float-box1"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        &lt;div class="bfc-inner-box1"&gt;&lt;/</span>div&gt;</span><br><span class="line">    &lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="bfc-float-box2"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        &lt;div class="bfc-inner-box2"&gt;&lt;/</span>div&gt;</span><br><span class="line">    &lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;/</span>div&gt;</span><br></pre></td></tr></table></figure>
+<div class="box" style="width: 100%;"><div class="bfc-float-box1" style="    float: left;width: 100%;background: #ececdd;"><div class="bfc-inner-box1" style="    margin-bottom: 30px;width: 100px;height: 100px;background: #f7c3c3;"></div></div><div class="bfc-float-box2" style="float: left;width: 100%;background: #f9d7f7;"><div class="bfc-inner-box2" style="margin-top: 50px;width: 100px;height: 100px;background: #d3cff7;"></div></div></div><div style="clear:both"></div>
+
+<p>两个<code>float</code>的父盒子在为它下面的盒子创建了一个<code>BFC</code>，从而将<code>float</code>盒子里面的子盒子给隔离了起来，因此也就不会<code>margin</code>折叠了。所以上下边距<code>30px</code>和<code>50px</code>并不会重叠，因为不属于同一个<code>BFC</code>，当然在同一个<code>BFC</code>内边距还是会重叠的。同时可以发现每个元素的<code>margin box</code>的左边， 与包含块<code>border box</code>的左边相接触(对于从左往右的格式化，否则相反)。即使存在浮动也是如此。</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line">.box &#123;</span><br><span class="line">	width: <span class="hljs-number">100</span>%;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.bfc-float-box1 &#123;</span><br><span class="line">	float: left;</span><br><span class="line">	width: <span class="hljs-number">100</span>px;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	background: #ececdd;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">.bfc-overflow-box2 &#123;</span><br><span class="line">	overflow: hidden;</span><br><span class="line">	width: <span class="hljs-number">100</span>px;</span><br><span class="line">	height: <span class="hljs-number">100</span>px;</span><br><span class="line">	background: #d3cff7;</span><br><span class="line">&#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="box"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="bfc-float-box1"&gt;float&lt;/</span>div&gt;</span><br><span class="line">    &lt;div <span class="hljs-class"><span class="hljs-keyword">class</span></span>=<span class="hljs-string">"bfc-overflow-box2"</span>&gt;overflow&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;/</span>div&gt;</span><br></pre></td></tr></table></figure>
+<div class="box" style="width: 100%;"><div class="bfc-float-box1" style="float: left;width: 100px;height: 100px;background: #ececdd;">float</div><div class="bfc-overflow-box2" style="overflow: hidden;width: 100px;height: 100px;background: #d3cff7;">overflow</div></div><div style="clear:both"></div>
+
+<p><code>BFC</code>不会重叠浮动元素，由于第二个<code>div</code>使用<code>overflow: hidden</code>触发了新的<code>BFC</code>，因此它被排布在<code>float</code>元素的右边而不会重叠。<br>需要注意的是形成新<code>BFC</code>上下文中的块级盒的表现形式和根元素下(根元素也也会触发<code>BFC</code>)的块级盒的表现形式是一样的，只是可以理解为它们所处的上下文环境不一样，新的<code>BFC</code>和根元素的<code>BFC</code>各自形成独立空间，接下来要说的就是在处理浮动时为什么表现为<code>display:block</code>和<code>display:table</code>的区别，前者不会形成新的<code>BFC</code>，而后者则会。</p>
+<h2 id="清楚浮动和包含浮动的区别"><a href="#清楚浮动和包含浮动的区别" class="headerlink" title="清楚浮动和包含浮动的区别"></a>清楚浮动和包含浮动的区别</h2><h3 id="display-block"><a href="#display-block" class="headerlink" title="display: block"></a><code>display: block</code></h3><p>在没有形成新的<code>BFC</code>时，如果块级父元素<code>height</code>为<code>auto</code>或不设置，没有设置<code>padding</code>或<code>border</code>属性，且只有块级子元素，那么父元素的默认高度将由子元素的盒模型决定，从最高块级子元素的外边框边界到最低块级子元素的外边框边界之间的距离（注意不包含子元素的的外边距<code>margin</code>值）</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">  .father &#123;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      background: #ececdd;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .son &#123;</span><br><span class="line">      height: <span class="hljs-number">100</span>px;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">      margin-bottom: <span class="hljs-number">30</span>px;</span><br><span class="line">      background: #d3cff7;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="father" style=" width: 100%;background: #ececdd;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div>
+
+
+<p>如果<code>fahter</code>块有内容或者有<code>padding</code>或<code>border</code>属性</p>
+<figure class="highlight plain hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;style type=&quot;text/css&quot;&gt;</span><br><span class="line">  .father &#123;</span><br><span class="line">      width: 100%;</span><br><span class="line">      background: #ececdd;</span><br><span class="line">      border: 1px solid #f9d7f7;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .son &#123;</span><br><span class="line">      ...</span><br><span class="line">  &#125;</span><br><span class="line">&lt;/style&gt;</span><br><span class="line"></span><br><span class="line">&lt;div class=&quot;father&quot;&gt;</span><br><span class="line">    &lt;div class=&quot;son&quot;&gt;</span><br><span class="line">        son</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<div class="father" style=" width: 100%;background: #ececdd;  border: 1px solid #f9d7f7;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;"> son </div></div><div style="clear:both"></div>
+
+<p>可以看出上面两个例子的不同之处在于第一个例子<code>father</code>块的大小和<code>son</code>块一样，那么如果两个一样的此<code>father</code>块之间的外边距如何计算呢？</p>
+<ul>
+<li><code>father</code>块带<code>border</code>属性</li>
+</ul>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">  .father &#123;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      background: #ececdd;</span><br><span class="line">      border: 1px solid #f9d7f7;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .son &#123;</span><br><span class="line">      height: <span class="hljs-number">100</span>px;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">      margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">      background: #d3cff7;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="father" style=" width: 100%;background: #ececdd;  border: 1px solid #f9d7f7;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;"> son </div></div><div class="father" style=" width: 100%;background: #ececdd;  border: 1px solid #f9d7f7;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;"> son </div></div><div style="clear:both"></div>
+
+<ul>
+<li><code>father</code>块不带<code>border</code>属性</li>
+</ul>
+<div class="father" style=" width: 100%;background: #ececdd;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div><div class="father" style=" width: 100%;background: #ececdd;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div>
+
+
+<p>可以发现两个<code>son</code>块在外边距上发生了重叠，使得外边距为较大值<code>50px</code>；如果此时给第二个<code>father</code>块一个<code>margin-top: 40px；</code>的属性值，外边距重叠仍然使两个son块的距离为<code>50px</code>，因此<code>father</code>块一个<code>margin-top</code>属性值就不能起到效果了。</p>
+<div class="father" style=" width: 100%;background: #ececdd;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div><div class="father" style=" width: 100%;background: #ececdd;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div>
+
+
+
+<h3 id="display-table"><a href="#display-table" class="headerlink" title="display: table"></a><code>display: table</code></h3><p>如果使<code>father</code>块触发<code>BFC</code>上下文呢？</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">  .father &#123;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      background: #ececdd;</span><br><span class="line">      display: table;  <span class="hljs-comment">/*触发新的BFC上下文*/</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .son &#123;</span><br><span class="line">      height: <span class="hljs-number">100</span>px;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">      margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">      background: #d3cff7;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="father" style=" width: 100%;background: #ececdd;  display: table;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div><div class="father" style=" width: 100%;background: #ececdd;  display: table; "><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div>
+
+<p>可以发现两个<code>son</code>块之间的距离为<code>70px</code>，并且父元素的高度还包含了<code>son</code>块的<code>margin</code>值，如果此时同样给第二个父元素一个<code>margin-top</code>值，可以发现此时的<code>40px</code>有了效果</p>
+<div class="father" style=" width: 100%;background: #ececdd;  display: table;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div><div class="father" style=" width: 100%;background: #ececdd;  display: table; margin-top:40px;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7;">son</div></div>
+
+<p>当然如果把<code>son</code>块换成<code>float</code>元素（需要注意的是<code>son</code>块又形成了新的<code>BFC</code>），那么效果仍然一样，而且不会产生高度塌陷，因为<code>BFC</code>会计算浮动元素的高度，而不会使<code>father</code>块高度塌陷，也就起到了包含浮动的作用</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">  .father &#123;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      background: #ececdd;</span><br><span class="line">      display: table;  <span class="hljs-comment">/*触发新的BFC上下文*/</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  .son &#123;</span><br><span class="line">      height: <span class="hljs-number">100</span>px;</span><br><span class="line">      width: <span class="hljs-number">100</span>%;</span><br><span class="line">      margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">      margin-bottom: <span class="hljs-number">50</span>px;</span><br><span class="line">      background: #d3cff7;</span><br><span class="line">      float: left;</span><br><span class="line">  &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<div class="father" style=" width: 100%;background: #ececdd;  display: table;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7; float: left;">float son</div></div><div class="father" style=" width: 100%;background: #ececdd;  display: table; margin-top:40px;"><div class="son" style=" height: 100px;width: 100%;margin-top: 50px;margin-bottom: 30px;background: #d3cff7; float: left;">float son</div></div>
+
+<p>所以最后你可以比较一下以下两种的情况的区别了</p>
+<ul>
+<li>去除浮动</li>
+</ul>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">   .father &#123;</span><br><span class="line">       width: <span class="hljs-number">100</span>%;</span><br><span class="line">       background: #ececdd;</span><br><span class="line">       display: block;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   .father: after &#123;</span><br><span class="line">     content: <span class="hljs-string">""</span>;</span><br><span class="line">     clear: both;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   .son &#123;</span><br><span class="line">       height: <span class="hljs-number">100</span>px;</span><br><span class="line">       width: <span class="hljs-number">100</span>%;</span><br><span class="line">       margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">       margin-bottom: <span class="hljs-number">30</span>px;</span><br><span class="line">       background: #d3cff7;</span><br><span class="line">   &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father" style="margin-top: 40px;"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>包含浮动</li>
+</ul>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;style type=<span class="hljs-string">"text/css"</span>&gt;</span><br><span class="line">   .father &#123;</span><br><span class="line">       width: <span class="hljs-number">100</span>%;</span><br><span class="line">       background: #ececdd;</span><br><span class="line">       display: table;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   .father: after &#123;</span><br><span class="line">     content: <span class="hljs-string">""</span>;</span><br><span class="line">     clear: both;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   .son &#123;</span><br><span class="line">       height: <span class="hljs-number">100</span>px;</span><br><span class="line">       width: <span class="hljs-number">100</span>%;</span><br><span class="line">       margin-top: <span class="hljs-number">50</span>px;</span><br><span class="line">       margin-bottom: <span class="hljs-number">30</span>px;</span><br><span class="line">       background: #d3cff7;</span><br><span class="line">   &#125;</span><br><span class="line">&lt;<span class="hljs-regexp">/style&gt;</span></span><br><span class="line"><span class="hljs-regexp"></span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br><span class="line"><span class="hljs-regexp">&lt;div class="father" style="margin-top: 40px;"&gt;</span></span><br><span class="line"><span class="hljs-regexp">    &lt;div class="son"&gt;</span></span><br><span class="line"><span class="hljs-regexp">        son</span></span><br><span class="line"><span class="hljs-regexp">    &lt;/</span>div&gt;</span><br><span class="line">&lt;<span class="hljs-regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+<p>那么你就会清楚为什么<code>bootstrap</code>清除浮动的<code>less</code>是这样的</p>
+<figure class="highlight javascript hljs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="hljs-comment">// The use of `table` rather than `block` is only necessary if using</span></span><br><span class="line"><span class="hljs-comment">// `:before` to contain the top-margins of child elements.</span></span><br><span class="line"></span><br><span class="line">.clearfix() &#123;</span><br><span class="line">  &amp;:before，</span><br><span class="line">  &amp;:after &#123;</span><br><span class="line">    content: <span class="hljs-string">" "</span>; </span><br><span class="line">    display: table; </span><br><span class="line">  &#125;</span><br><span class="line">  &amp;:after &#123;</span><br><span class="line">    clear: both;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><ul>
+<li><a href="https://www.amazon.cn/CSS%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97-%E8%BF%88%E8%80%B6/dp/B0011F5SIC/ref=sr_1_1/458-4976171-7710746?s=books&amp;ie=UTF8&amp;qid=1502118223&amp;sr=1-1&amp;keywords=CSS%E6%9D%83%E5%A8%81%E6%8C%87%E5%8D%97" target="_blank" rel="noopener">CSS权威指南</a></li>
+<li><a href="http://web.jobbole.com/84808/" target="_blank" rel="noopener">什么是BFC</a></li>
+</ul>
+
+        </div>
+        
+        <div class="level is-size-7 is-uppercase">
+            <div class="level-start">
+                <div class="level-item">
+                    <span class="is-size-6 has-text-grey has-mr-7">#</span>
+                    <a class="has-link-grey -link" href="/tags/BFC/">BFC</a>, <a class="has-link-grey -link" href="/tags/css/">css</a>, <a class="has-link-grey -link" href="/tags/float/">float</a>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        <div class="social-share"></div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css">
+<script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script>
+        
+    </div>
+</div>
+
+
+
+
+
+<div class="card card-transparent">
+    <div class="level post-navigation is-flex-wrap is-mobile">
+        
+        <div class="level-start">
+            <a class="level level-item has-link-grey  article-nav-prev" href="/2017/09/24/他/">
+                <i class="level-item fas fa-chevron-left"></i>
+                <span class="level-item">他</span>
+            </a>
+        </div>
+        
+        
+        <div class="level-end">
+            <a class="level level-item has-link-grey  article-nav-next" href="/2017/07/16/那一年，我毕业了/">
+                <span class="level-item">那一年，我毕业了</span>
+                <i class="level-item fas fa-chevron-right"></i>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+
+
+<div class="card">
+    <div class="card-content">
+        <h3 class="title is-5 has-text-weight-normal">评论</h3>
+        
+<div id="valine-thread"></div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+<script>
+    new Valine({
+        el: '#valine-thread' ,
+        notify: false,
+        verify: false,
+        app_id: 'BmxI4S2gUX7BUGeiMMBDdvjg-gzGzoHsz',
+        app_key: 'DsCeAhw0p809CAcYr9ippw87',
+        placeholder: 'Say something...',
+        avatar: 'wavatar'
+    });
+</script>
+
+    </div>
+</div>
+</div>
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen  has-order-1 column-left ">
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <nav class="level">
+            <div class="level-item has-text-centered">
+                <div>
+                    <img class="image is-128x128 has-mb-6" src="/images/avatar.jpeg" alt="ziyi2">
+                    
+                    <p class="is-size-4 is-block">
+                        ziyi2
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-block">
+                        人生一世,草木一秋.
+                    </p>
+                    
+                    
+                    <p class="is-size-6 is-flex is-flex-center has-text-grey">
+                        <i class="fas fa-map-marker-alt has-mr-7"></i>
+                        <span>Hangzhou, P.R.China.</span>
+                    </p>
+                    
+                </div>
+            </div>
+        </nav>
+        <nav class="level is-mobile">
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        文章
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        6
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        分类
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        3
+                    </p>
+                </div>
+            </div>
+            <div class="level-item has-text-centered is-marginless">
+                <div>
+                    <p class="heading">
+                        标签
+                    </p>
+                    <p class="title has-text-weight-normal">
+                        19
+                    </p>
+                </div>
+            </div>
+        </nav>
+        <div class="level">
+            <a class="level-item button is-link is-rounded" href="http://github.com/ziyi2">
+                关注我</a>
+        </div>
+        
+        
+    </div>
+</div>
+    
+        
+
+
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                分类
+            </h3>
+            <ul class="menu-list">
+            <li>
+        <a class="level is-marginless" href="/categories/前端/">
+            <span class="level-start">
+                <span class="level-item">前端</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">2</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/旅行/">
+            <span class="level-start">
+                <span class="level-item">旅行</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">1</span>
+            </span>
+        </a></li><li>
+        <a class="level is-marginless" href="/categories/随笔/">
+            <span class="level-start">
+                <span class="level-item">随笔</span>
+            </span>
+            <span class="level-end">
+                <span class="level-item tag">3</span>
+            </span>
+        </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            标签云
+        </h3>
+        <a href="/tags/BFC/" style="font-size: 10px;">BFC</a> <a href="/tags/cookie/" style="font-size: 10px;">cookie</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/float/" style="font-size: 10px;">float</a> <a href="/tags/http/" style="font-size: 10px;">http</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/websocket/" style="font-size: 10px;">websocket</a> <a href="/tags/代理/" style="font-size: 10px;">代理</a> <a href="/tags/加密/" style="font-size: 10px;">加密</a> <a href="/tags/协议/" style="font-size: 10px;">协议</a> <a href="/tags/挪威的森林/" style="font-size: 10px;">挪威的森林</a> <a href="/tags/村上春树/" style="font-size: 10px;">村上春树</a> <a href="/tags/毕业旅行/" style="font-size: 10px;">毕业旅行</a> <a href="/tags/猫/" style="font-size: 10px;">猫</a> <a href="/tags/短篇小说/" style="font-size: 10px;">短篇小说</a> <a href="/tags/缓存/" style="font-size: 10px;">缓存</a> <a href="/tags/莫泊桑/" style="font-size: 10px;">莫泊桑</a> <a href="/tags/记忆/" style="font-size: 10px;">记忆</a> <a href="/tags/长篇小说/" style="font-size: 10px;">长篇小说</a>
+    </div>
+</div>
+
+    
+    
+        <div class="column-right-shadow is-hidden-widescreen ">
+        
+            
+        
+            
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2018/04/10/http协议分析/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/404.jpeg" alt="http协议分析">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2018-04-10T13:24:23.000Z">2018-04-10</time></div>
+                    <a href="/2018/04/10/http协议分析/" class="has-link-black-ter is-size-6">http协议分析</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/前端/">前端</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2018/01/25/挪威的森林里/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/nuoweidesenglin.jpg" alt="挪威的森林里">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2018-01-24T16:07:13.000Z">2018-01-25</time></div>
+                    <a href="/2018/01/25/挪威的森林里/" class="has-link-black-ter is-size-6">挪威的森林里</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/随笔/">随笔</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/09/24/他/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/cat.jpeg" alt="他">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-09-24T13:03:44.000Z">2017-09-24</time></div>
+                    <a href="/2017/09/24/他/" class="has-link-black-ter is-size-6">他</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/随笔/">随笔</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/08/02/清除和去除浮动/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/cssClearFloatTitle.jpg" alt="清除和去除浮动">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-08-02T14:00:27.000Z">2017-08-02</time></div>
+                    <a href="/2017/08/02/清除和去除浮动/" class="has-link-black-ter is-size-6">清除和去除浮动</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/前端/">前端</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/07/16/那一年，我毕业了/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://ziyi2.su.bcebos.com/tripTitle.jpeg?authorization=bce-auth-v1/1506c42c5a69429286578b2c43e19c5b/2019-01-16T14:51:30Z/-1/host/357c40bc1cdf0f1bd66b64ce2600e3db046cdb68ef4796ec83984e40ce978361" alt="那一年，我毕业了">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-07-16T10:01:39.000Z">2017-07-16</time></div>
+                    <a href="/2017/07/16/那一年，我毕业了/" class="has-link-black-ter is-size-6">那一年，我毕业了</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/旅行/">旅行</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/04/">
+                <span class="level-start">
+                    <span class="level-item">四月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/09/">
+                <span class="level-start">
+                    <span class="level-item">九月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/08/">
+                <span class="level-start">
+                    <span class="level-item">八月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/07/">
+                <span class="level-start">
+                    <span class="level-item">七月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/06/">
+                <span class="level-start">
+                    <span class="level-item">六月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+        
+            <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <ul class="menu-list">
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/BFC/">
+                        <span class="level-start">
+                            <span class="level-item">BFC</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/cookie/">
+                        <span class="level-start">
+                            <span class="level-item">cookie</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/css/">
+                        <span class="level-start">
+                            <span class="level-item">css</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/float/">
+                        <span class="level-start">
+                            <span class="level-item">float</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/http/">
+                        <span class="level-start">
+                            <span class="level-item">http</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/https/">
+                        <span class="level-start">
+                            <span class="level-item">https</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/websocket/">
+                        <span class="level-start">
+                            <span class="level-item">websocket</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/代理/">
+                        <span class="level-start">
+                            <span class="level-item">代理</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/加密/">
+                        <span class="level-start">
+                            <span class="level-item">加密</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/协议/">
+                        <span class="level-start">
+                            <span class="level-item">协议</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/挪威的森林/">
+                        <span class="level-start">
+                            <span class="level-item">挪威的森林</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/村上春树/">
+                        <span class="level-start">
+                            <span class="level-item">村上春树</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/毕业旅行/">
+                        <span class="level-start">
+                            <span class="level-item">毕业旅行</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/猫/">
+                        <span class="level-start">
+                            <span class="level-item">猫</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/短篇小说/">
+                        <span class="level-start">
+                            <span class="level-item">短篇小说</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/缓存/">
+                        <span class="level-start">
+                            <span class="level-item">缓存</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/莫泊桑/">
+                        <span class="level-start">
+                            <span class="level-item">莫泊桑</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/记忆/">
+                        <span class="level-start">
+                            <span class="level-item">记忆</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/长篇小说/">
+                        <span class="level-start">
+                            <span class="level-item">长篇小说</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+        
+        </div>
+    
+</div>
+
+                
+
+
+
+
+<div class="column is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only has-order-3 column-right ">
+    
+        
+    
+        
+<div class="card widget">
+    <div class="card-content">
+        <h3 class="menu-label">
+            最新文章
+        </h3>
+        
+        <article class="media">
+            
+            <a href="/2018/04/10/http协议分析/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/404.jpeg" alt="http协议分析">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2018-04-10T13:24:23.000Z">2018-04-10</time></div>
+                    <a href="/2018/04/10/http协议分析/" class="has-link-black-ter is-size-6">http协议分析</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/前端/">前端</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2018/01/25/挪威的森林里/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/nuoweidesenglin.jpg" alt="挪威的森林里">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2018-01-24T16:07:13.000Z">2018-01-25</time></div>
+                    <a href="/2018/01/25/挪威的森林里/" class="has-link-black-ter is-size-6">挪威的森林里</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/随笔/">随笔</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/09/24/他/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/cat.jpeg" alt="他">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-09-24T13:03:44.000Z">2017-09-24</time></div>
+                    <a href="/2017/09/24/他/" class="has-link-black-ter is-size-6">他</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/随笔/">随笔</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/08/02/清除和去除浮动/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://raw.githubusercontent.com/ziyi2/blog-images/master/cssClearFloatTitle.jpg" alt="清除和去除浮动">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-08-02T14:00:27.000Z">2017-08-02</time></div>
+                    <a href="/2017/08/02/清除和去除浮动/" class="has-link-black-ter is-size-6">清除和去除浮动</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/前端/">前端</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+        <article class="media">
+            
+            <a href="/2017/07/16/那一年，我毕业了/" class="media-left">
+                <p class="image is-64x64">
+                    <img class="thumbnail" src="https://ziyi2.su.bcebos.com/tripTitle.jpeg?authorization=bce-auth-v1/1506c42c5a69429286578b2c43e19c5b/2019-01-16T14:51:30Z/-1/host/357c40bc1cdf0f1bd66b64ce2600e3db046cdb68ef4796ec83984e40ce978361" alt="那一年，我毕业了">
+                </p>
+            </a>
+            
+            <div class="media-content">
+                <div class="content">
+                    <div><time class="has-text-grey is-size-7 is-uppercase" datetime="2017-07-16T10:01:39.000Z">2017-07-16</time></div>
+                    <a href="/2017/07/16/那一年，我毕业了/" class="has-link-black-ter is-size-6">那一年，我毕业了</a>
+                    <p class="is-size-7 is-uppercase">
+                        <a class="has-link-grey -link" href="/categories/旅行/">旅行</a>
+                    </p>
+                </div>
+            </div>
+        </article>
+        
+    </div>
+</div>
+
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+        <h3 class="menu-label">
+            归档
+        </h3>
+        <ul class="menu-list">
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/04/">
+                <span class="level-start">
+                    <span class="level-item">四月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2018/01/">
+                <span class="level-start">
+                    <span class="level-item">一月 2018</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/09/">
+                <span class="level-start">
+                    <span class="level-item">九月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/08/">
+                <span class="level-start">
+                    <span class="level-item">八月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/07/">
+                <span class="level-start">
+                    <span class="level-item">七月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        <li>
+            <a class="level is-marginless" href="/archives/2017/06/">
+                <span class="level-start">
+                    <span class="level-item">六月 2017</span>
+                </span>
+                <span class="level-end">
+                    <span class="level-item tag">1</span>
+                </span>
+            </a>
+        </li>
+        
+        </ul>
+        </div>
+    </div>
+</div>
+    
+        <div class="card widget">
+    <div class="card-content">
+        <div class="menu">
+            <h3 class="menu-label">
+                标签
+            </h3>
+            <ul class="menu-list">
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/BFC/">
+                        <span class="level-start">
+                            <span class="level-item">BFC</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/cookie/">
+                        <span class="level-start">
+                            <span class="level-item">cookie</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/css/">
+                        <span class="level-start">
+                            <span class="level-item">css</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/float/">
+                        <span class="level-start">
+                            <span class="level-item">float</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/http/">
+                        <span class="level-start">
+                            <span class="level-item">http</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/https/">
+                        <span class="level-start">
+                            <span class="level-item">https</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/websocket/">
+                        <span class="level-start">
+                            <span class="level-item">websocket</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/代理/">
+                        <span class="level-start">
+                            <span class="level-item">代理</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/加密/">
+                        <span class="level-start">
+                            <span class="level-item">加密</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/协议/">
+                        <span class="level-start">
+                            <span class="level-item">协议</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/挪威的森林/">
+                        <span class="level-start">
+                            <span class="level-item">挪威的森林</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/村上春树/">
+                        <span class="level-start">
+                            <span class="level-item">村上春树</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/毕业旅行/">
+                        <span class="level-start">
+                            <span class="level-item">毕业旅行</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/猫/">
+                        <span class="level-start">
+                            <span class="level-item">猫</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/短篇小说/">
+                        <span class="level-start">
+                            <span class="level-item">短篇小说</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/缓存/">
+                        <span class="level-start">
+                            <span class="level-item">缓存</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/莫泊桑/">
+                        <span class="level-start">
+                            <span class="level-item">莫泊桑</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/记忆/">
+                        <span class="level-start">
+                            <span class="level-item">记忆</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a class="level is-marginless" href="/tags/长篇小说/">
+                        <span class="level-start">
+                            <span class="level-item">长篇小说</span>
+                        </span>
+                        <span class="level-end">
+                            <span class="level-item tag">1</span>
+                        </span>
+                    </a>
+                </li>
+                
+            </ul>
+        </div>
+    </div>
+</div>
+    
+    
+</div>
+
+            </div>
+        </div>
+    </section>
+    <footer class="footer">
+    <div class="container">
+        <div class="level">
+            <div class="level-start has-text-centered-mobile">
+                <a class="footer-logo is-block has-mb-6" href="/">
+                
+                    <img src="/images/logo.jpg" alt="清除和去除浮动" height="28">
+                
+                </a>
+                <p class="is-size-7">
+                &copy; 2019 ziyi2&nbsp;
+                <!-- Powered by <a href="http://hexo.io/" target="_blank">Hexo</a> & <a
+                        href="http://github.com/ppoffice/hexo-theme-icarus">Icarus</a> -->
+                </p>
+            </div>
+            <div class="level-end">
+            
+                <div class="field has-addons is-flex-center-mobile has-mt-5-mobile is-flex-wrap is-flex-middle">
+                
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Download on GitHub" href="http://github.com/ziyi2">
+                        
+                        <i class="fab fa-github"></i>
+                        
+                    </a>
+                </p>
+                
+                <p class="control">
+                    <a class="button is-white is-large" target="_blank" title="Zhihu link" href="https://www.zhihu.com/people/zi-yi-91-26/activities">
+                        
+                        <i class="fab fa-zhihu"></i>
+                        
+                    </a>
+                </p>
+                
+                </div>
+            
+            </div>
+        </div>
+    </div>
+</footer>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script>
+<script>moment.locale("zh-CN");</script>
+
+
+    
+    
+    
+    <script src="/js/animation.js"></script>
+    
+
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script>
+    <script src="/js/gallery.js" defer></script>
+    
+
+    
+    
+
+<div id="outdated">
+    <h6>Your browser is out-of-date!</h6>
+    <p>Update your browser to view this website correctly. <a id="btnUpdateBrowser" href="http://outdatedbrowser.com/">Update
+            my browser now </a></p>
+    <p class="last"><a href="#" id="btnCloseUpdateBrowser" title="Close">&times;</a></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/outdatedbrowser@1.1.5/outdatedbrowser/outdatedbrowser.min.js" defer></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        outdatedBrowser({
+            bgColor: '#f25648',
+            color: '#ffffff',
+            lowerThan: 'flex'
+        });
+    });
+</script>
+
+
+    
+    
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.5/unpacked/MathJax.js?config=TeX-MML-AM_CHTML" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    MathJax.Hub.Config({
+        'HTML-CSS': {matchFontHeight: false},
+        SVG: {matchFontHeight: false},
+        CommonHTML: {matchFontHeight: false}
+    });
+});
+</script>
+
+    
+    
+
+<a id="back-to-top" title="回到顶端" href="javascript:;">
+    <i class="fas fa-chevron-up"></i>
+</a>
+<script src="/js/back-to-top.js" defer></script>
+
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" defer></script>
+    <script src="/js/clipboard.js" defer></script>
+    
+
+    
+
+
+<script src="/js/main.js" defer></script>
+
+    
+    <div class="searchbox ins-search">
+    <div class="searchbox-container ins-search-container">
+        <div class="searchbox-input-wrapper">
+            <input type="text" class="searchbox-input ins-search-input" placeholder="想要查找什么...">
+            <span class="searchbox-close ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="searchbox-result-wrapper ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+    (function (window) {
+        var INSIGHT_CONFIG = {
+            TRANSLATION: {
+                POSTS: '文章',
+                PAGES: '页面',
+                CATEGORIES: '分类',
+                TAGS: '标签',
+                UNTITLED: '(无标题)',
+            },
+            CONTENT_URL: '/content.json',
+        };
+        window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+    })(window);
+</script>
+<script src="/js/insight.js" defer></script>
+<link rel="stylesheet" href="/css/search.css">
+<link rel="stylesheet" href="/css/insight.css">
+    
+</body>
+</html>
