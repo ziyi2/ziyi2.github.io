@@ -8,3 +8,5 @@
 - [NPM发布和使用命令行(CLI)工具](https://github.com/ziyi2/ziyi2.github.io/issues/7)
 - [基于Vue的简易MVVM实现](https://github.com/ziyi2/ziyi2.github.io/issues/8)
 - [基于Express应用框架的技术选型方案浅谈](https://github.com/ziyi2/ziyi2.github.io/issues/9)
+- [面试分享：两年工作经验成功面试阿里P6总结](https://github.com/ziyi2/ziyi2.github.io/issues/10)
+- [2019 前端之路](https://github.com/ziyi2/ziyi2.github.io/issues/11)
