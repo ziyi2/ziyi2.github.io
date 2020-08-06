@@ -10,4 +10,6 @@
 - [基于 Express 应用框架的技术选型方案浅谈](https://github.com/ziyi2/ziyi2.github.io/issues/9)
 - [面试分享：两年工作经验成功面试阿里 P6 总结](https://github.com/ziyi2/ziyi2.github.io/issues/10)
 - [2019 前端之路](https://github.com/ziyi2/ziyi2.github.io/issues/11)
-- [在阿里我是如何当面试官的（持续更新）](https://juejin.im/post/5e6ebfa86fb9a07ca714d0ec)
+- [在阿里我是如何当面试官的（持续更新）](https://github.com/ziyi2/ziyi2.github.io/issues/12)
+- [技术文章的写作技巧分享](https://github.com/ziyi2/ziyi2.github.io/issues/13)
+- [从零开始配置 TypeScript 项目](https://github.com/ziyi2/ziyi2.github.io/issues/14)
